@@ -1,3 +1,4 @@
+require 'dave'
 --[[
 
 =====================================================================
@@ -91,7 +92,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -152,14 +153,14 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 8
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<CR>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
@@ -239,6 +240,75 @@ require('lazy').setup({
 
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
+
+  -- make tmux panes and vim splits coexist nicely
+  {
+    'christoomey/vim-tmux-navigator',
+    cmd = {
+      'TmuxNavigateLeft',
+      'TmuxNavigateDown',
+      'TmuxNavigateUp',
+      'TmuxNavigateRight',
+      'TmuxNavigatePrevious',
+    },
+    keys = {
+      { '<M-h>', '<cmd>TmuxNavigateLeft<cr>' },
+      { '<M-j>', '<cmd>TmuxNavigateDown<cr>' },
+      { '<M-k>', '<cmd>TmuxNavigateUp<cr>' },
+      { '<M-l>', '<cmd>TmuxNavigateRight<cr>' },
+      { '<M-\\>', '<cmd>TmuxNavigatePrevious<cr>' },
+    },
+  },
+
+  -- Go setup https://github.com/ray-x/go.nvim
+  {
+    'ray-x/go.nvim',
+    dependencies = { -- optional packages
+      'ray-x/guihua.lua',
+      'neovim/nvim-lspconfig',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    opts = {},
+    event = { 'CmdlineEnter' },
+    ft = { 'go', 'gomod' },
+    build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
+  },
+
+  -- Go debugging
+  { 'mfussenegger/nvim-dap' },
+
+  {
+    'laytan/cloak.nvim',
+    config = function()
+      require('cloak').setup {
+        enabled = true,
+        cloak_character = '*',
+        -- The applied highlight group (colors) on the cloaking, see `:h highlight`.
+        highlight_group = 'Comment',
+        -- Applies the length of the replacement characters for all matched
+        -- patterns, defaults to the length of the matched pattern.
+        cloak_length = nil, -- Provide a number if you want to hide the true length of the value.
+        -- Whether it should try every pattern to find the best fit or stop after the first.
+        try_all_patterns = true,
+        patterns = {
+          {
+            -- Match any file starting with '.env'.
+            -- This can be a table to match multiple file patterns.
+            file_pattern = '.env*',
+            -- Match an equals sign and any character after it.
+            -- This can also be a table of patterns to cloak,
+            -- example: cloak_pattern = { ':.+', '-.+' } for yaml files.
+            cloak_pattern = '=.+',
+            -- A function, table or string to generate the replacement.
+            -- The actual replacement will contain the 'cloak_character'
+            -- where it doesn't cover the original text.
+            -- If left empty the legacy behavior of keeping the first character is retained.
+            replace = nil,
+          },
+        },
+      }
+    end,
+  },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -491,7 +561,7 @@ require('lazy').setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>vca', vim.lsp.buf.code_action, '[V]iew [C]ode [A]ction')
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -703,6 +773,7 @@ require('lazy').setup({
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -745,13 +816,14 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin-macchiato'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -802,7 +874,23 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'vim',
+        'vimdoc',
+        'python',
+        'go',
+        'rust',
+        'javascript',
+        'typescript',
+        'query',
+        'sql',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {

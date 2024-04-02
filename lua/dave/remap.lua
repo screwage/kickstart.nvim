@@ -16,7 +16,7 @@ vim.keymap.set('x', '<leader>p', '"_dP')
 vim.keymap.set('n', '<leader>d', '"_d')
 vim.keymap.set('v', '<leader>d', '"_d')
 
-vim.keymap.set('n', '<CR>', ':noh<CR>', { silent = true })
+vim.keymap.set('n', '<CR>', '<cmd>nohlsearch<CR>', { silent = true })
 
 -- use to copy into system clipboard
 -- currently unnecessary as we're using clipboard "unnamed"

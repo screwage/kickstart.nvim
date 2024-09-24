@@ -256,6 +256,14 @@ require('lazy').setup({
     },
   },
 
+  -- Highlight colors (css)
+  {
+    'NvChad/nvim-colorizer.lua',
+    opts = {
+      user_default_options = { RRGGBBAA = true },
+    },
+  },
+
   -- Go setup https://github.com/ray-x/go.nvim
   {
     'ray-x/go.nvim',

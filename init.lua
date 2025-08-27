@@ -290,6 +290,13 @@ require('lazy').setup({
     build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
   },
 
+  {
+    'benomahony/uv.nvim',
+    opts = {
+      picker_integration = true,
+    },
+  },
+
   -- Go debugging
   { 'mfussenegger/nvim-dap' },
 
